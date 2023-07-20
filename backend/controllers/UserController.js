@@ -3,15 +3,15 @@ const User = require("../models/User");
 
 //dependencias
 const bcrypt = require("bcrypt");
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 //helpers
 const createUserToken = require("../helpers/create-user-token");
-const getToken = require('../helpers/get-token')
+const getToken = require("../helpers/get-token");
+const getUserByToken = require("../helpers/get-user-by-token");
 
 module.exports = class UserController {
-
   static async register(req, res) {
     //desestruturando todos os dados que vieram do body
     const { name, email, phone, password, confirmpassword } = req.body;
@@ -103,74 +103,104 @@ module.exports = class UserController {
     }
 
     //check if password match with db password
-    const checkPassword = await bcrypt.compare(password,user.password)
+    const checkPassword = await bcrypt.compare(password, user.password);
 
-    if(!checkPassword){
-        res.status(422).json({
-            message:'Senha invalida!'
-        })
-        return
+    if (!checkPassword) {
+      res.status(422).json({
+        message: "Senha invalida!",
+      });
+      return;
     }
 
-    await createUserToken(user,req,res)
+    await createUserToken(user, req, res);
   }
 
-  static async checkUser(req,res){
+  static async checkUser(req, res) {
+    let currentUser;
 
-    let currentUser
+    console.log(req.headers.authorization);
 
-    console.log(req.headers.authorization)
+    if (req.headers.authorization) {
+      const token = getToken(req); //resgatando o token
+      const decoded = jwt.verify(token, "secret"); //decodificando o token informando nossa palavra chave
 
-    if(req.headers.authorization){
-        const token = getToken(req) //resgatando o token
-        const decoded = jwt.verify(token,'secret') //decodificando o token informando nossa palavra chave
-
-        currentUser = await User.findById(decoded.id)
-        currentUser.password =undefined
-
-    }else{
-        currentUser = null
+      currentUser = await User.findById(decoded.id);
+      currentUser.password = undefined;
+    } else {
+      currentUser = null;
     }
 
-    res.status(200).send(currentUser)
+    res.status(200).send(currentUser);
   }
 
-  static async getUserById(req,res){
+  static async getUserById(req, res) {
+    const id = req.params.id;
 
-    const id = req.params.id
-
-    if(!mongoose.Types.ObjectId.isValid(id)){
-      return res.status(400).json({message : 'Id passado é invalido'})
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Id passado é invalido" });
     }
 
-    const user = await User.findById(id).select("-password")
+    const user = await User.findById(id).select("-password");
 
-    if(!user){
-        res.status(422).json({
-            message: 'Usuario nao encontrado'
-        })
-        return
+    if (!user) {
+      res.status(422).json({
+        message: "Usuario nao encontrado",
+      });
+      return;
     }
 
-    res.status(200).json({user})
+    res.status(200).json({ user });
   }
 
-  static async editUser(req,res){
-    
-    const id = req.params.id
+  static async editUser(req, res) {
 
-    if(!mongoose.Types.ObjectId.isValid(id)){
-      return res.status(400).json({message : 'Id passado é invalido'})
+    const id = req.params.id; //req params sao o que pegamos da URL
+
+    //checamos se a informacao id passada realmente se encaixa no padrao do ObjectId do nosso MongoDB
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Id passado é invalido" });
     }
 
-    const user = await User.findById(id)
+    const token = getToken(req)
+    const user = await getUserByToken(token)
 
-    if(!user){
-        res.status(422).json({
-            message: 'Usuario nao encontrado'
-        })
-        return
+    const { name, email, phone, password, confirmpassword } = req.body; //req body sao o que pegamos do corpo da requisicao
+    let image = "";
+
+    //validacoes
+    if (!name) {
+      res.status(422).json({ message: "O campo nome é obrigatorio" });
+      return;
+    }
+    user.name = name;
+    if (!email) {
+      res.status(422).json({ message: "O campo email é obrigatorio" });
+      return;
+    }
+
+    //checando se o email esta sendo usado por outra pessoa
+    const userExists = await User.findOne({ email: email });
+
+    if (user.email !== email && userExists) {
+      res.status(422).json({
+        message: "Este email ja esta sendo usado!",
+      });
+    }
+    user.email = email;
+
+    if (!phone) {
+      res.status(422).json({ message: "O campo Telefone é obrigatorio" });
+      return;
+    }
+    if (!password) {
+      res.status(422).json({ message: "O campo password é obrigatorio" });
+      return;
+    }
+    if (!confirmpassword) {
+      res
+        .status(422)
+        .json({ message: "O campo confirmpassword é obrigatorio" });
+      return;
     }
   }
-
 };
