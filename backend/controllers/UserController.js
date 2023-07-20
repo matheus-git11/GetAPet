@@ -4,6 +4,7 @@ const User = require("../models/User");
 //dependencias
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 
 //helpers
 const createUserToken = require("../helpers/create-user-token");
@@ -137,6 +138,11 @@ module.exports = class UserController {
   static async getUserById(req,res){
 
     const id = req.params.id
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({message : 'Id passado é invalido'})
+    }
+
     const user = await User.findById(id).select("-password")
 
     if(!user){
@@ -150,10 +156,21 @@ module.exports = class UserController {
   }
 
   static async editUser(req,res){
-    res.status(200).json({
-        message: 'Deu certo Update'
-    })
-    return
+    
+    const id = req.params.id
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({message : 'Id passado é invalido'})
+    }
+
+    const user = await User.findById(id)
+
+    if(!user){
+        res.status(422).json({
+            message: 'Usuario nao encontrado'
+        })
+        return
+    }
   }
 
 };
