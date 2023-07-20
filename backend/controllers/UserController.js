@@ -1,6 +1,6 @@
 const createUserToken = require("../helpers/create-user-token");
 const User = require("../models/User");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
 module.exports = class UserController {
 
@@ -11,65 +11,99 @@ module.exports = class UserController {
     //validations
     if (!name) {
       res.status(422).json({ message: "O campo nome é obrigatorio" });
-      return
+      return;
     }
     if (!email) {
       res.status(422).json({ message: "O campo email é obrigatorio" });
-      return
+      return;
     }
     if (!phone) {
       res.status(422).json({ message: "O campo Phone é obrigatorio" });
-      return
+      return;
     }
     if (!password) {
       res.status(422).json({ message: "O campo password é obrigatorio" });
-      return
+      return;
     }
     if (!confirmpassword) {
       res
         .status(422)
         .json({ message: "O campo confirmpassword é obrigatorio" });
-        return
+      return;
     }
 
     if (password !== confirmpassword) {
       res.status(422).json({
         message: "A senha e a confirmacao de senha precisam ser iguais",
       });
-      return
+      return;
     }
 
     //check if user exists
-    const userExists = await User.findOne({email: email})
+    const userExists = await User.findOne({ email: email });
 
-    if(userExists){
-        res
-        .status(422)
-        .json({
-            message: 'O usario ja esta cadastrado em nosso sistema , utilize outro e-mail!'
+    if (userExists) {
+      res.status(422).json({
+        message:
+          "O usario ja esta cadastrado em nosso sistema , utilize outro e-mail!",
+      });
+      return;
+    }
+
+    //create a password
+    const salt = await bcrypt.genSalt(12);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    //create a user
+    const user = new User({
+      name,
+      email,
+      phone,
+      password: passwordHash,
+    });
+
+    try {
+      const newUser = await user.save();
+      await createUserToken(newUser, req, res);
+      return;
+    } catch (error) {
+      res.status(500).json({ message: error });
+      return;
+    }
+  }
+
+  static async login(req, res) {
+    const { email, password } = req.body;
+
+    if (!email) {
+      res.status(422).json({ message: "O campo email é obrigatorio" });
+      return;
+    }
+
+    if (!password) {
+      res.status(422).json({ message: "A senha é obrigatoria" });
+      return;
+    }
+
+    //check if user exist
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      res.status(422).json({
+        message: "Nao ha usuario cadastrado com este e-mail",
+      });
+      return;
+    }
+
+    //check if password match with db password
+    const checkPassword = await bcrypt.compare(password,user.password)
+
+    if(!checkPassword){
+        res.status(422).json({
+            message:'Senha invalida!'
         })
         return
     }
 
-    //create a password
-    const salt = await bcrypt.genSalt(12)
-    const passwordHash = await bcrypt.hash(password,salt)
-
-    //create a user
-    const user = new User({
-        name,
-        email,
-        phone,
-        password: passwordHash
-    })
-
-    try {
-        const newUser = await user.save()
-        await createUserToken(newUser,req,res)
-        return
-    } catch (error) {
-        res.status(500).json({message: error})
-        return
-    }
+    await createUserToken(user,req,res)
   }
 };
