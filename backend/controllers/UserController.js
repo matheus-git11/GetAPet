@@ -12,7 +12,7 @@ const getToken = require("../helpers/get-token");
 const getUserByToken = require("../helpers/get-user-by-token");
 
 module.exports = class UserController {
-  
+
   static async register(req, res) {
     //desestruturando todos os dados que vieram do body
     const { name, email, phone, password, confirmpassword } = req.body;
@@ -165,7 +165,12 @@ module.exports = class UserController {
     const user = await getUserByToken(token);
 
     const { name, email, phone, password, confirmpassword } = req.body; //req body sao o que pegamos do corpo da requisicao
+
     let image = "";
+
+    if(req.file){
+      user.image = req.file.filename
+    }
 
     //validacoes
     if (!name) {
