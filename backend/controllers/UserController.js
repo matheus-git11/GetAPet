@@ -153,7 +153,6 @@ module.exports = class UserController {
   }
 
   static async editUser(req, res) {
-
     const id = req.params.id; //req params sao o que pegamos da URL
 
     //checamos se a informacao id passada realmente se encaixa no padrao do ObjectId do nosso MongoDB
@@ -161,8 +160,8 @@ module.exports = class UserController {
       return res.status(400).json({ message: "Id passado é invalido" });
     }
 
-    const token = getToken(req)
-    const user = await getUserByToken(token)
+    const token = getToken(req);
+    const user = await getUserByToken(token);
 
     const { name, email, phone, password, confirmpassword } = req.body; //req body sao o que pegamos do corpo da requisicao
     let image = "";
@@ -192,15 +191,30 @@ module.exports = class UserController {
       res.status(422).json({ message: "O campo Telefone é obrigatorio" });
       return;
     }
-    if (!password) {
-      res.status(422).json({ message: "O campo password é obrigatorio" });
-      return;
+
+    user.phone = phone;
+
+    if (password != confirmpassword) {
+      return res.status(422).json({ message: "As senhas nao sao iguais" });
+    } else if (password === confirmpassword && password != null) {
+      //creating password
+      const salt = await bcrypt.genSalt(12);
+      const passwordHash = await bcrypt.hash(password, salt);
+      user.password = passwordHash;
     }
-    if (!confirmpassword) {
-      res
-        .status(422)
-        .json({ message: "O campo confirmpassword é obrigatorio" });
-      return;
+
+    try {
+      //atualizacao
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: user._id },
+        { $set: user },
+        { new: true }
+      );
+      res.status(200).json({
+        message: "usuario atualizado com sucesso!",
+      });
+    } catch (error) {
+      return res.status(500).json({ message: error });
     }
   }
 };
