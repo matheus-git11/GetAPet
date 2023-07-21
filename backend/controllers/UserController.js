@@ -12,6 +12,7 @@ const getToken = require("../helpers/get-token");
 const getUserByToken = require("../helpers/get-user-by-token");
 
 module.exports = class UserController {
+  
   static async register(req, res) {
     //desestruturando todos os dados que vieram do body
     const { name, email, phone, password, confirmpassword } = req.body;
