@@ -104,6 +104,24 @@ module.exports = class PetController{
     }
 
     static async getPetById(req,res){
+        //resgatando o id paassado pelo parametro da requisicao
+        const id = req.params.id
+        //verificando se o Id passaado se encaixa no modelo do ObjectID do MongoDB
+        if(!ObjectId.isValid(id)){
+            return res.status(422).json({message : 'Id Invalido'})
+        }   
+        //resgatando nosso pet atraves de uma acao assincrona no banco de dados
+        const pet = await Pet.findOne({_id: id})
+        //tratamento de erro para se a busca no banco de dados for null 
+        if(!pet){
+            res.status(404).json({message : 'Pet nao encontrado'})
+        }
+        //retornando status de sucesso e objeto pet no corpo de response
+        res.status(200).json({pet})
+
+    }
+
+    static async removePetById(req,res){
 
         const id = req.params.id
 
@@ -112,14 +130,21 @@ module.exports = class PetController{
         }
 
         const pet = await Pet.findOne({_id: id})
-
+       
         if(!pet){
             res.status(404).json({message : 'Pet nao encontrado'})
         }
 
-        res.status(200).json({pet})
+        //checando se o usuario logado registrou o Pet
+        const token = getToken(req)
+        const user = await getUserByToken(token)
 
+        if(pet.user._id.toString() !== user._id.toString()){
+            res.status(422).json({meesage: 'Houve um problema em processar a sua solicitacao'})
+        }
+
+        await Pet.findByIdAndRemove(id)
+
+        return res.status(200).json({message: 'Pet removido com sucesso'})
     }
-
-    
 }
