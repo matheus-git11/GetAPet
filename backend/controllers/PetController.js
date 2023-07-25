@@ -69,4 +69,13 @@ module.exports = class PetController{
             res.status(500).json({message :error})
         }
     }
+
+    static async getAll(req,res){
+
+        const pets = await Pet.find().sort('-createdAt') // usamos o - para ordenarmos em ordem crescente 
+        return res.status(200).json({
+            pets
+        })
+    }
+    
 }
