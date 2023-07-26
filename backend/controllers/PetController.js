@@ -262,4 +262,38 @@ module.exports = class PetController {
     })
 
   }
+
+  static async concludeAdoption(req,res){
+
+    const id = req.params.id
+    //checando se o Id é objectId
+    if(!ObjectId.isValid(id)){
+        return res.status(422).json({ message: "Id Invalido" });
+    }
+
+    //checando se o pet existe
+    const pet = await Pet.findOne({_id : id})
+
+    if(!pet){
+       return res.status(404).json({message : 'Pet nao encontrado'})
+    }
+
+    //checando se o o usuario é dono do pet
+    const token = getToken(req)
+    const user = await getUserByToken(token)
+    if(!pet.user._id.equals(user._id)){
+      return res.status(422).json({
+           message : 'Voce nao pode confirmar a adocao de um Pet que nao é seu'
+       })
+   }
+
+   pet.available = false
+   await Pet.findByIdAndUpdate(id,pet)
+
+   res.status(200).json({
+    message: 'Parabens seu Pet foi adotado'
+   })
+
+
+  }
 };
