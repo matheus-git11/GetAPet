@@ -1,16 +1,35 @@
 /* eslint-disable no-unused-vars */
-import {Link} from 'react-router-dom'
-import Input from '../../form/Input'
-import styles from './Form.module.css'
+
+//hooks
+import { useState } from "react";
+//Modulos
+import { Link } from "react-router-dom";
+//Componentes
+import Input from "../../form/Input";
+//Css
+import styles from "./Form.module.css";
 
 function Register() {
 
-    function handleChange(e){}
+    const[user,setUser] = useState({})
+
+    function handleChange(e) {
+        setUser(
+            {...user,[e.target.name] : e.target.value}
+        )
+    }
+
+    function handleSubmit(e){
+        e.preventDefault()
+        //enviando o usuario para o banco
+        console.log(user)
+    }
+  
 
   return (
     <section className={styles.form_container}>
       <h1>Registrar</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <Input
           text="Nome"
           type="text"
@@ -39,21 +58,20 @@ function Register() {
           placeholder="digite a sua Senha"
           handleOnChange={handleChange}
         />
-         <Input
+        <Input
           text="Confirmacao de Senha"
           type="password"
-          name="password"
+          name="ConfirmPassword"
           placeholder="Confirme a sua Senha"
           handleOnChange={handleChange}
         />
 
-        <input type='submit' value="cadastrar"/>
-    </form>
-    <p>
+        <input type="submit" value="cadastrar" />
+      </form>
+      <p>
         Já tem conta? <Link to="/login">Clique aqui.</Link>
-    </p>
+      </p>
     </section>
   );
 }
-
 export default Register;

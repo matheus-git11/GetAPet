@@ -17,3 +17,17 @@
     font-size: 1.1em;
     font-weight: bold;
 }
+
+
+.form_container input[type='submit'] :hover{
+    background-color: #1C8A42;
+}
+
+.form_container p{
+    margin-top: 1em;
+}
+
+.form_container p a{
+    color: #16479d;
+    font-weight: bold;
+}
