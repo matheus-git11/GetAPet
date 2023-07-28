@@ -1,17 +1,20 @@
 /* eslint-disable no-unused-vars */
 
 //hooks
-import { useState } from "react";
+import { useContext, useState } from "react";
 //Modulos
 import { Link } from "react-router-dom";
 //Componentes
 import Input from "../../form/Input";
 //Css
 import styles from "./Form.module.css";
+//context
+import {Context} from '../../../context/UserContext'
 
 function Register() {
 
     const[user,setUser] = useState({})
+    const {register} = useContext(Context)
 
     function handleChange(e) {
         setUser(
@@ -23,6 +26,7 @@ function Register() {
         e.preventDefault()
         //enviando o usuario para o banco
         console.log(user)
+        register(user)
     }
   
 
@@ -61,7 +65,7 @@ function Register() {
         <Input
           text="Confirmacao de Senha"
           type="password"
-          name="ConfirmPassword"
+          name="confirmpassword"
           placeholder="Confirme a sua Senha"
           handleOnChange={handleChange}
         />

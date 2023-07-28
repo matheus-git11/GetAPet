@@ -11,9 +11,11 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Container from './components/layout/Container'
 
+
+
 function App() {
   return (
-    <Router>
+    <Router> 
       <Navbar />
       <Container>
         <Routes>
