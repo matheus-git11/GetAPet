@@ -1,7 +1,7 @@
 //modulos
 import { Link } from "react-router-dom";
 //arquivos estaticos
-import Logo from '../../assets/img/logo.png'
+import Logo from '../../../assets/img/logo.png'
 //estilizacao css
 import styles from './Navbar.module.css'
 

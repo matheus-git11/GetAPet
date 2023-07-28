@@ -7,9 +7,9 @@ import Register from "./components/pages/auth/Register";
 import Home from "./components/pages/Home";
 
 //components
-import Navbar from "./components/layout/Navbar";
-import Footer from "./components/layout/Footer";
-import Container from './components/layout/Container'
+import Navbar from "./components/layout/navbar/Navbar";
+import Footer from "./components/layout/footer/Footer";
+import Container from './components/layout/container/Container'
 
 
 
