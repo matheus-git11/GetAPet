@@ -10,6 +10,7 @@ import Home from "./components/pages/Home";
 import Navbar from "./components/layout/navbar/Navbar";
 import Footer from "./components/layout/footer/Footer";
 import Container from './components/layout/container/Container'
+import Message from "./components/layout/message/Message";
 
 
 
@@ -17,6 +18,7 @@ function App() {
   return (
     <Router> 
       <Navbar />
+      <Message/>
       <Container>
         <Routes>
           <Route path="/login" element={<Login />} />
