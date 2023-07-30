@@ -1,13 +1,29 @@
-import { useState } from 'react'
-import styles from './Message.module.css'
+import { useState ,useEffect} from "react";
+import styles from "./Message.module.css";
+import bus from "../../../utils/bus";
 
-function Message(){
+function Message() {
+    const[visibility,setVisibility] = useState(false)
+    const[message,setMessage] = useState('')
+    const [type, setType] = useState('');
 
-    const [type,setType] = ("")
+    useEffect(() =>{
+        bus.addListener('flash',({message,type}) =>{
+            setVisibility(true)
+            setMessage(message)
+            setType(type)
 
-    return(
-        <div className={`${styles.message} ${styles[type]}`}>Minha mensagem</div>
-    )
+            setTimeout(() => {
+                setVisibility(false)
+            },5000)
+        })
+    },[])
+
+    return (
+     visibility  && (
+        <div className={`${styles.message} ${styles[type]}`}>{message}</div>
+     )
+  );
 }
 
-export default Message
+export default Message;
