@@ -6,6 +6,16 @@ export default function useAuth() {
   const [authenticated, setAuthenticated] = useState(false);
   const { setFlashMessage } = useFlashMessage();
 
+  useEffect(() =>{
+    const token = localStorage.getItem('token')
+
+    if(token){
+       api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`
+       setAuthenticated(true)
+    }
+  },[])
+
+  //nessa funcao estou retornanda true ou false pois nao consigo usar hooks do react router pelo fato de meu componente nao fazer parte do Routes
   async function register(user) {
     let msgText = "Cadastro Realizado com sucesso";
     let msgType = "sucess";
@@ -27,8 +37,7 @@ export default function useAuth() {
   async function authUser(data) {
     setAuthenticated(true);
     localStorage.setItem("token", JSON.stringify(data.token));
-   
   }
 
-  return { register };
+  return { register , authenticated };
 }
