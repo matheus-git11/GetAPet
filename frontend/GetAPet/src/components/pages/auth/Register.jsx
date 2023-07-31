@@ -2,6 +2,7 @@
 
 //hooks
 import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 //Modulos
 import { Link } from "react-router-dom";
 //Componentes
@@ -15,6 +16,7 @@ function Register() {
 
     const[user,setUser] = useState({})
     const {register} = useContext(Context)
+    const navigate = useNavigate()
 
     function handleChange(e) {
         setUser(
@@ -26,7 +28,10 @@ function Register() {
         e.preventDefault()
         //enviando o usuario para o banco
         console.log(user)
-        register(user)
+        const confirm = register(user)
+        if(confirm){
+          navigate("/");
+        }
     }
   
 
