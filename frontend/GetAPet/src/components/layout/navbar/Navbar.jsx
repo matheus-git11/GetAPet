@@ -1,5 +1,5 @@
 //modulos
-import { Link ,useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 //arquivos estaticos
 import Logo from "../../../assets/img/logo.png";
@@ -9,12 +9,12 @@ import styles from "./Navbar.module.css";
 import { Context } from "../../../context/UserContext";
 
 function Navbar() {
-  const { authenticated , logout } = useContext(Context);
-  const navigate = useNavigate()
+  const { authenticated, logout } = useContext(Context);
+  const navigate = useNavigate();
 
-  function Logout(){
-    logout()
-    navigate('/')
+  function Logout() {
+    logout();
+    navigate("/");
   }
 
   return (
@@ -27,8 +27,11 @@ function Navbar() {
         <li>
           <Link to="/">Adotar</Link>
         </li>
-        {authenticated ? (
+        {authenticated ? (  
           <>
+            <li>
+              <Link to="/user/profile">Perfil</Link>
+            </li>
             <li onClick={Logout}>Sair</li>
           </>
         ) : (
