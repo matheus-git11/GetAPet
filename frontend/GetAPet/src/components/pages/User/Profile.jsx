@@ -7,6 +7,7 @@ import useFlashMessage from "../../../hooks/useFlashMessage";
 
 function Profile() {
   const [user, setUser] = useState({});
+  const [preview, setPreview] = useState("");
   const [token] = useState(localStorage.getItem("token") || "");
   const { setFlashMessage } = useFlashMessage();
 
@@ -23,6 +24,7 @@ function Profile() {
   }, [token]);
 
   function onFileChange(e) {
+    setPreview(e.target.files[0]);
     setUser({ ...user, [e.target.name]: e.target.files[0] });
   }
   function handleChange(e) {
@@ -45,7 +47,7 @@ function Profile() {
       .then((response) => {
         return response.data;
       })
-      .catch((error) => {
+      .catch((error) => { 
         msgType = "error";
         return error.response.data;
       });
@@ -56,7 +58,16 @@ function Profile() {
     <section>
       <div className={styles.profile_header}>
         <h1>Perfil</h1>
-        <p>Preview Imagem</p>
+        {(user.image || preview) && (
+          <img
+            src={
+              preview
+                ? URL.createObjectURL(preview)
+                : `http://localhost:5000/images/users/${user.image}`
+            }
+            alt={user.name}
+          />
+        )}
       </div>
       <form onSubmit={handleSubmit} className={formStyles.form_container}>
         <Input
