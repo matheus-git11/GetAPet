@@ -6,14 +6,14 @@ export default function useAuth() {
   const [authenticated, setAuthenticated] = useState(false);
   const { setFlashMessage } = useFlashMessage();
 
-  useEffect(() =>{
-    const token = localStorage.getItem('token')
+  useEffect(() => {
+    const token = localStorage.getItem("token");
 
-    if(token){
-       api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`
-       setAuthenticated(true)
+    if (token) {
+      api.defaults.headers.Authorization = `Bearer ${JSON.parse(token)}`;
+      setAuthenticated(true);
     }
-  },[])
+  }, []);
 
   //nessa funcao estou retornanda true ou false pois nao consigo usar hooks do react router pelo fato de meu componente nao fazer parte do Routes
   async function register(user) {
@@ -24,14 +24,38 @@ export default function useAuth() {
         return response.data;
       });
       await authUser(data);
-      return true
+      return true;
     } catch (error) {
       console.log(error);
       msgText = error.response.data.message;
       msgType = "error";
     }
     setFlashMessage(msgText, msgType);
-    return false
+    return false;
+  }
+
+  function logout() {
+    const msgText = "Logout realizado com sucesso!";
+    const msgType = "sucess";
+    setAuthenticated(false);
+    localStorage.removeItem("token");
+    api.defaults.headers.Authorization = undefined;
+    setFlashMessage(msgText, msgType);
+  }
+
+  async function login(user) {
+    let msgText = "login realizado com sucesso";
+    let msgType = "sucess";
+    try {
+      const data = await api.post("/users/login", user).then((response) => {
+        return response.data;
+      });
+      await authUser(data);
+    } catch (error) {
+      msgText = error.response.data.message;
+      msgType = "error";
+    }
+    setFlashMessage(msgText, msgType);
   }
 
   async function authUser(data) {
@@ -39,14 +63,5 @@ export default function useAuth() {
     localStorage.setItem("token", JSON.stringify(data.token));
   }
 
-  function logout(){
-    const msgText = 'Logout realizado com sucesso!'
-    const msgType = 'sucess'
-    setAuthenticated(false)
-    localStorage.removeItem('token')
-    api.defaults.headers.Authorization = undefined
-    setFlashMessage(msgText,msgType)
-  }
-
-  return { register , authenticated ,logout};
+  return { register, authenticated, logout, login};
 }
