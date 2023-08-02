@@ -20,7 +20,7 @@ function PetForm({ handleSubmit, petData, btnText }) {
   }
   function submit(e) {
     e.preventDefault();
-    console.log(pet);
+    handleSubmit(pet)
   }
 
   return (
