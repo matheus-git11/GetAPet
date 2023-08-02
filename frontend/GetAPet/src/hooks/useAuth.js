@@ -51,11 +51,15 @@ export default function useAuth() {
         return response.data;
       });
       await authUser(data);
+      setFlashMessage(msgText, msgType);
+      return true
     } catch (error) {
       msgText = error.response.data.message;
       msgType = "error";
+      setFlashMessage(msgText, msgType);
+      return false
     }
-    setFlashMessage(msgText, msgType);
+    
   }
 
   async function authUser(data) {
