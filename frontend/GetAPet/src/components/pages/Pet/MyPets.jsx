@@ -22,6 +22,24 @@ function MyPets() {
       });
   }, [token]);
 
+  async function removePet(id){
+    let msgType = 'sucess'
+    const data = await api.delete(`/pets/${id}`,{
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      }
+    }).then((response) =>{
+      const updatedPets = pets.filter((pet) => pet._id != id)
+      setPets(updatedPets)
+      return response.data
+    })
+    .catch((error) =>{
+      msgType = 'error'
+      return error.response.data
+    })
+    setFlashMessage(data.message,msgType)
+  }
+
   return (
     <section>
       <div className={styles.petlist_header}>
@@ -30,8 +48,8 @@ function MyPets() {
       </div>
       <div className={styles.petlist_container}>
         {pets.length > 0 &&
-          pets.map((pet) => (
-            <div className={styles.petlist_row} key={pet.id}>
+          pets.map((pet) =>  (
+            <div className={styles.petlist_row} key={pet._id}>
               <RoundedImage
                 src={`http://localhost:5000/images/pets/${pet.images[0]}`}
                 alt={pet.name}
@@ -43,7 +61,9 @@ function MyPets() {
                   <>
                     {pet.adopter && <button className={styles.conclude_btn}>Concluir adocao</button>}
                     <Link to={`/pet/edit/${pet._id}`}>Editar</Link>
-                    <button>Excluir</button>
+                    <button onClick={()=>{
+                      removePet(pet._id)
+                    }}>Excluir</button>
                   </>
                 ) : (
                   <p>Pet ja adotado</p>
