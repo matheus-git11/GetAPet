@@ -14,15 +14,15 @@ function Home() {
 
   return (
     <section>
-      <div>
+      <div className={styles.pet_home_header}>
         <h1>Adote um Pet</h1>
         <p>Veja os detalhes de cada um e conheca o tutor deles</p>
       </div>
-      <div>
+      <div className={styles.pet_container}>
         {pets.length > 0 &&
           pets.map((pet) => (
-            <div>
-              <p>Imagem do Pet</p>
+            <div className={styles.pet_card}>
+              <div style={{backgroundImage: `url(http://localhost:5000/images/pets/${pet.images[0]})`}} className={styles.pet_card_image}></div>
               <h3>{pet.name}</h3>
               <p>
                 <span className="bold">Peso:</span> {pet.weight}kg
