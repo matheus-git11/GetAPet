@@ -201,13 +201,11 @@ module.exports = class PetController {
     }
 
     //tratando imagens
-    if (images.length === 0) {
-      return res.status(422).json({ message: "A Imagem é obrigatoria" });
-    } else {
-        updatedData.images = []
-        images.map((image) =>{
-            updatedData.images.push(image.filename)
-        })
+    if (images.length > 0) {
+      updatedData.images = []
+      images.map((image) =>{
+          updatedData.images.push(image.filename)
+    })
     }
 
     //atualizando o Pet
