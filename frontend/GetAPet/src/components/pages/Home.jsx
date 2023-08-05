@@ -27,7 +27,7 @@ function Home() {
               <p>
                 <span className="bold">Peso:</span> {pet.weight}kg
               </p>
-              {pet.available ? <Link to={`pet/${pet._id}`}>Mais detalhes</Link> : <p>Adotado</p>}
+              {pet.available ? <Link to={`pet/${pet._id}`}>Mais detalhes</Link> : <p className={styles.adopted_text}>Adotado</p>}
             </div>
           ))}
         {pets.length === 0 && (
