@@ -83,3 +83,11 @@
     color: #FFF;
     border-color: #25b456;
 }
+
+.contacts{
+    margin-left: 2em;
+}
+
+.contacts p{
+    margin-bottom: 0.5em;
+}
